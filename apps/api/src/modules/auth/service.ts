@@ -1,4 +1,4 @@
-import { Inject, Service } from "@asenajs/asena/server";
+import { Inject, PostConstruct, Service } from "@asenajs/asena/server";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { DatabaseService, type TDatabaseClient } from "@/db";
@@ -13,7 +13,8 @@ export class AuthService {
 	@Inject(DatabaseService)
 	private db: DatabaseService;
 
-	constructor() {
+	@PostConstruct()
+	async initialize() {
 		this._client = init(this.db.client);
 	}
 
