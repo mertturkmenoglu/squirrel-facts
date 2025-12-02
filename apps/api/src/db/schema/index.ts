@@ -93,7 +93,9 @@ export const assets = pgTable(
 	"assets",
 	{
 		id: bigint({ mode: "number" }).generatedAlwaysAsIdentity().primaryKey(),
-		squirrelId: bigint({ mode: "number" }).references(() => squirrels.id),
+		squirrelId: bigint({ mode: "number" })
+			.notNull()
+			.references(() => squirrels.id, { onDelete: "cascade" }),
 		url: text().notNull(),
 		description: text(),
 		order: integer().notNull().default(0),
