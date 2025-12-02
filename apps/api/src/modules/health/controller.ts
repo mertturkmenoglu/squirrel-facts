@@ -4,14 +4,14 @@ import type { Context } from "@asenajs/ergenecore";
 @Controller({
 	path: "/",
 })
-export class HelloController {
+export class HealthController {
 	@Get({
 		path: "/",
 	})
-	async hello(context: Context) {
+	async healthCheck(context: Context) {
 		return context.send(
 			{
-				message: "Hello World!",
+				message: "OK",
 			},
 			{
 				status: 200,
