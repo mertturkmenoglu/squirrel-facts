@@ -6,7 +6,6 @@
 		"dev": "bun run --hot src/index.ts",
 		"build": "asena build",
 		"start:prod": "bun run dist/index.js",
-		"env": "bun run src/scripts/env.ts",
 		"db:start": "docker compose up -d",
 		"db:push": "bunx --bun drizzle-kit push",
 		"db:studio": "bunx --bun drizzle-kit studio",
