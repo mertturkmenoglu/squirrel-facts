@@ -1,0 +1,24 @@
+name: squirrel
+
+services:
+  sf-postgres:
+    container_name: sf-postgres
+    image: postgres:16.4-alpine
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: squirrel
+    volumes:
+      - sf-pg-data:/var/lib/postgresql/data
+    shm_size: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  sf-pg-data:
