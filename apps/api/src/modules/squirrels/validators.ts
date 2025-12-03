@@ -66,3 +66,39 @@ export const createOutput = z.object({
 });
 
 export type CreateOutput = z.infer<typeof createOutput>;
+
+export const updateInputParams = $.squirrel.pick({ id: true });
+
+export type UpdateInputParams = z.infer<typeof updateInputParams>;
+
+export const updateInputBody = $insert.squirrel.partial();
+
+export type UpdateInputBody = z.infer<typeof updateInputBody>;
+
+@Middleware({ validator: true })
+export class UpdateValidator extends ValidationService {
+	param() {
+		return updateInputParams;
+	}
+
+	json() {
+		return updateInputBody;
+	}
+}
+
+export const updateOutput = z.object({
+	squirrel: squirrel,
+});
+
+export type UpdateOutput = z.infer<typeof updateOutput>;
+
+export const deleteInputParams = $.squirrel.pick({ id: true });
+
+export type DeleteInputParams = z.infer<typeof deleteInputParams>;
+
+@Middleware({ validator: true })
+export class DeleteValidator extends ValidationService {
+	param() {
+		return deleteInputParams;
+	}
+}

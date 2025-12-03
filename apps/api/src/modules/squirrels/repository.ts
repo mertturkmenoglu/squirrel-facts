@@ -1,9 +1,10 @@
 import { Inject, Service } from "@asenajs/asena/server";
 import { HttpException } from "@asenajs/ergenecore";
+import { eq } from "drizzle-orm";
 import { DatabaseService } from "@/db";
 import * as schema from "@/db/schema";
 import { Pagination } from "@/lib/pagination";
-import type { CreateInput } from "./validators";
+import type { CreateInput, UpdateInputBody } from "./validators";
 
 @Service({
 	name: "SquirrelsRepository",
@@ -34,7 +35,7 @@ export class SquirrelsRepository {
 
 	async get(id: string) {
 		const squirrel = await this.db.client.query.squirrels.findFirst({
-			where: (t, { eq }) => eq(t.id, Number(id)),
+			where: (t, { eq }) => eq(t.id, id),
 			with: {
 				assets: true,
 			},
@@ -72,7 +73,24 @@ export class SquirrelsRepository {
 		return result;
 	}
 
-	async update(id: string, data: any) {}
+	async update(id: string, data: UpdateInputBody) {
+		const result = await this.db.client.transaction(async (tx) => {
+			await tx
+				.update(schema.squirrels)
+				.set(data)
+				.where(eq(schema.squirrels.id, id));
 
-	async delete(id: string) {}
+			const squirrel = await this.get(id);
+
+			return squirrel;
+		});
+
+		return result;
+	}
+
+	async delete(id: string) {
+		await this.db.client
+			.delete(schema.squirrels)
+			.where(eq(schema.squirrels.id, id));
+	}
 }

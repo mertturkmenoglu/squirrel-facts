@@ -17,6 +17,9 @@ import {
 	getOutput,
 	ListValidator,
 	listOutput,
+	type UpdateInputBody,
+	UpdateValidator,
+	updateOutput,
 } from "./validators";
 
 @Controller({
@@ -86,13 +89,35 @@ export class SquirrelsController {
 		return context.send(parseResult.data, 201);
 	}
 
-	@Patch("/:id")
+	@Patch({
+		path: "/:id",
+		description: "Update a squirrel entity by ID",
+		middlewares: [Authn],
+		validator: UpdateValidator,
+	})
 	async update(context: Context) {
-		return context.send("Not implemented", 501);
+		const session = context.getValue<TSession>("session");
+		const userId = session.user.id;
+		const id = context.getParam("id");
+		const body = await context.getBody<UpdateInputBody>();
+		const result = await this.service.update(userId, id, body);
+		const parseResult = updateOutput.safeParse(result);
+
+		if (!parseResult.success) {
+			throw new HttpException(500, {
+				message: "Output validation failed",
+			});
+		}
+
+		return context.send(parseResult.data);
 	}
 
 	@Delete("/:id")
 	async delete(context: Context) {
-		return context.send("Not implemented", 501);
+		const session = context.getValue<TSession>("session");
+		const userId = session.user.id;
+		const id = context.getParam("id");
+		await this.service.delete(userId, id);
+		return context.send(null, 204);
 	}
 }
