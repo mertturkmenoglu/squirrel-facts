@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
 import {
-	bigint,
 	boolean,
 	index,
 	integer,
@@ -66,7 +65,9 @@ export const verifications = pgTable("verifications", {
 });
 
 export const squirrels = pgTable("squirrels", {
-	id: bigint({ mode: "number" }).generatedAlwaysAsIdentity().primaryKey(),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => Bun.randomUUIDv7()),
 	scientificName: text().notNull(),
 	commonName: text().notNull(),
 	description: text().notNull(),
@@ -92,8 +93,10 @@ export const squirrelRelations = relations(squirrels, ({ many }) => ({
 export const assets = pgTable(
 	"assets",
 	{
-		id: bigint({ mode: "number" }).generatedAlwaysAsIdentity().primaryKey(),
-		squirrelId: bigint({ mode: "number" })
+		id: text()
+			.primaryKey()
+			.$defaultFn(() => Bun.randomUUIDv7()),
+		squirrelId: text()
 			.notNull()
 			.references(() => squirrels.id, { onDelete: "cascade" }),
 		url: text().notNull(),
@@ -160,8 +163,8 @@ export const $ = {
 	}),
 	squirrel: createSelectSchema(squirrels, {
 		id: z
-			.number()
-			.int()
+			.string()
+			.min(1)
 			.meta({
 				description: "ID of the entry",
 				examples: ["abc123"],
@@ -268,15 +271,14 @@ export const $ = {
 	}),
 	asset: createSelectSchema(assets, {
 		id: z
-			.number()
-			.int()
+			.string()
+			.min(1)
 			.meta({
 				description: "Asset ID",
 				examples: [123456],
 			}),
 		squirrelId: z
-			.number()
-			.int()
+			.string()
 			.min(1)
 			.meta({
 				description: "ID of the associated squirrel",
