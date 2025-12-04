@@ -65,8 +65,19 @@ export class SquirrelsRepository {
 				});
 			}
 
-			const squirrel = await this.get(result.id.toString());
-
+			const squirrel = await tx.query.squirrels.findFirst({
+				where: (t, { eq }) => eq(t.id, result.id),
+				with: {
+					assets: true,
+				},
+			});
+	
+			if (!squirrel) {
+				throw new HttpException(404, {
+					message: `Squirrel with ID ${result.id} not found`,
+				});
+			}
+	
 			return squirrel;
 		});
 
